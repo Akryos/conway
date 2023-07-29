@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Conway's game of life</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="icon" href="./favicon.ico" type="image/x-icon">
+  </head>
+  <body>
+    <main>
+        <canvas id="gameboard" class="centered"></canvas>
+
+        <div id="controlPanel">
+            <h1>Conway's game of life</h1>
+            <label for="amountOfRows">amount of rows</label><br />
+            <input id="amountOfRows" type="number" placeholder="amount of rows" /><br /><br />
+            <label for="amountOfColumns">amount of columns</label><br />
+            <input id="amountOfColumns" type="number" placeholder="amount of columns" /><br /><br />
+            <label for="cellSize">cell size</label><br />
+            <input id="cellSize" type="number" placeholder="cell size" /><br /><br />
+            <label for="cycleSpeed">cycle speed</label><br />
+            <input id="cycleSpeed" type="number" placeholder="cycle speed" /><br /><br /><br />
+            <input id="buttonPrepareField" type="button" value="prepare field!" />
+        </div>
+    </main>
+	<script src="scripts/script.js"></script>
+  </body>
+</html>

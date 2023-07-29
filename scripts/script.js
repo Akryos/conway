@@ -18,6 +18,14 @@ document.getElementById('buttonPrepareField').addEventListener('click', function
     for(var x = 0; x < inputElements['amountOfRows']; x++) {
         for(var y = 0; y < inputElements['amountOfColumns']; y++) {
             ctx.fillStyle = '#' + Math.floor(Math.random()*16777215).toString(16);
+
+            ctx.strokeRect(
+                y * inputElements['cellSize'],
+                x * inputElements['cellSize'],
+                inputElements['cellSize'],
+                inputElements['cellSize']
+            );
+
             ctx.fillRect(
                 y * inputElements['cellSize'],
                 x * inputElements['cellSize'],

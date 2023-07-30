@@ -47,6 +47,7 @@ document.getElementById('buttonPrepareField').addEventListener('click', function
     }
 
     gameboard.addEventListener('click', function(e) {toggleCell(e);});
+    draw();
 });
 
 function getInputElementValues() {
@@ -59,8 +60,42 @@ function toggleCell(e) {
     let posX = e.clientX - gameboardBounds.left;
     let posY = e.clientY - gameboardBounds.top;
 
-    let x = Math.floor(posX / inputElements['cellSize']);
-    let y = Math.floor(posY / inputElements['cellSize']);
-
+    let x = Math.floor(posY / inputElements['cellSize']);
+    let y = Math.floor(posX / inputElements['cellSize']);
+    
     gameboardMemory[x][y] = 1 - gameboardMemory[x][y];
+}
+
+function draw() {
+    const ctx = gameboard.getContext("2d");
+    ctx.font = "10px serif";
+
+    setTimeout(function() {
+
+        for(var x = 0; x < inputElements['amountOfRows']; x++) {
+            for(var y = 0; y < inputElements['amountOfColumns']; y++) {
+                ctx.fillStyle = gameboardMemory[x][y] ? liveCellColor : deadCellColor;
+
+                ctx.strokeRect(
+                    y * inputElements['cellSize'],
+                    x * inputElements['cellSize'],
+                    inputElements['cellSize'],
+                    inputElements['cellSize']
+                );
+    
+                ctx.fillRect(
+                    y * inputElements['cellSize'],
+                    x * inputElements['cellSize'],
+                    inputElements['cellSize'],
+                    inputElements['cellSize']
+                );
+
+                // ctx.fillStyle = 'black';
+                // ctx.fillText(`${x}/${y}`, y * inputElements['cellSize'], (x+1) * inputElements['cellSize']);
+            }
+        }
+
+
+        requestAnimationFrame(draw);
+    }, inputElements['cycleSpeed']);
 }

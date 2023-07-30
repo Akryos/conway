@@ -11,6 +11,9 @@ var gameboardMemory = [];
 const deadCellColor = '#c7bea5';
 const liveCellColor = '#fcba03';
 
+var then = Date.now();
+var now = then;
+
 document.getElementById('buttonPrepareField').addEventListener('click', function(e) {
     getInputElementValues();
     gameboard = document.getElementById('gameboard');
@@ -117,13 +120,18 @@ function toggleCell(e) {
     let y = Math.floor(posX / inputElements['cellSize']);
     
     gameboardMemory[x][y] = 1 - gameboardMemory[x][y];
+    //draw();
 }
 
 function draw() {
-    const ctx = gameboard.getContext("2d");
-    ctx.font = "10px serif";
+    requestAnimationFrame(draw);
+    now = Date.now();
 
-    setTimeout(function() {
+    if((now - then) > inputElements['cycleSpeed']) {
+        then = now;
+
+        const ctx = gameboard.getContext("2d");
+        ctx.font = "10px serif";
 
         for(var x = 0; x < inputElements['amountOfRows']; x++) {
             for(var y = 0; y < inputElements['amountOfColumns']; y++) {
@@ -148,8 +156,6 @@ function draw() {
             }
         }
 
-
-        requestAnimationFrame(draw);
         calculateNextTurn();
-    }, inputElements['cycleSpeed']);
+    }
 }

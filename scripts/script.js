@@ -70,22 +70,29 @@ function calculateNextTurn() {
 
     for(var x = 0; x < inputElements['amountOfRows']; x++) {
         for(var y = 0; y < inputElements['amountOfColumns']; y++) {
-            neighborCount = 0 + getCellValue(x-1, y-1) + getCellValue(x-1, y+1) + getCellValue(x+1, y-1) + getCellValue(x+1, y+1);
+            neighborCount = 0 
+                + getCellValue(x-1, y-1)
+                + getCellValue(x, y-1)
+                + getCellValue(x+1, y-1)
+                + getCellValue(x-1, y)
+                + getCellValue(x+1, y)
+                + getCellValue(x-1, y+1)
+                + getCellValue(x, y+1)
+                + getCellValue(x+1, y+1);
 
             switch(neighborCount) {
                 case 0:
                 case 1:
-                case 4:
-                    //new value will be 0
                     shadowMemory[x][y] = 0;
                     break;
                 case 2:
-                    //new value will be old value
                     //no operation needed
                     break;
                 case 3:
-                    //new value will be 1
                     shadowMemory[x][y] = 1;
+                    break;
+                default: //more than 3
+                    shadowMemory[x][y] = 0;
                     break;
             }
         }

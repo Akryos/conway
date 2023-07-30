@@ -11,7 +11,6 @@ ctx.font = "10px serif";
 var gameboardBounds;
 var gameboardMemory = [];
 
-
 const deadCellColor = '#c7bea5';
 const liveCellColor = '#fcba03';
 
@@ -56,9 +55,9 @@ function createGameboard() {
 }
 
 function getUserInputElementValues() {
-      for (const key in inputElements) {
+    for (const key in inputElements) {
         inputElements[key] = document.getElementById(key).value || 0;
-      }
+    }
 }
 
 function incrementTurnValue() {

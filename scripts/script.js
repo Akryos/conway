@@ -4,9 +4,12 @@ inputElements['amountOfColumns'] = 0;
 inputElements['cellSize'] = 0;
 inputElements['cycleSpeed'] = 0;
 
-var gameboard;
+const gameboard = document.getElementById('gameboard');
+const ctx = gameboard.getContext("2d");
+ctx.font = "10px serif";
 var gameboardBounds;
 var gameboardMemory = [];
+
 
 const deadCellColor = '#c7bea5';
 const liveCellColor = '#fcba03';
@@ -14,73 +17,68 @@ const liveCellColor = '#fcba03';
 var then = Date.now();
 var now = then;
 
-document.getElementById('buttonPrepareField').addEventListener('click', function(e) {
-    getInputElementValues();
-    gameboard = document.getElementById('gameboard');
+gameboard.addEventListener('click', function(e) {
+    toggleCell(e);
+    drawNewCanvas();
+});
+
+document.getElementById('buttonPrepareField').addEventListener('click', function(){
+    createGameboard();
+    calculateNextRound();
+    drawNewCanvas();
+});
+
+document.getElementById('buttonStartGame').addEventListener('click', function(){
+    loopGame();
+});
+
+function createGameboard() {
+    getUserInputElementValues();
+    
     gameboard.width  = inputElements['amountOfColumns'] * inputElements['cellSize'];
     gameboard.height = inputElements['amountOfRows'] * inputElements['cellSize'];
     gameboardBounds = gameboard.getBoundingClientRect();
 
-    const ctx = gameboard.getContext("2d");
-
-    //create cells left to right, then top to bottom
-    for(var x = 0; x < inputElements['amountOfRows']; x++) {
+     //create cells left to right, then top to bottom
+     for(var x = 0; x < inputElements['amountOfRows']; x++) {
         gameboardMemory[x] = [];
 
         for(var y = 0; y < inputElements['amountOfColumns']; y++) {
             gameboardMemory[x][y] = 0;
-
-            //ctx.fillStyle = '#' + Math.floor(Math.random()*16777215).toString(16);
-            ctx.fillStyle = deadCellColor;
-
-            ctx.strokeRect(
-                y * inputElements['cellSize'],
-                x * inputElements['cellSize'],
-                inputElements['cellSize'],
-                inputElements['cellSize']
-            );
-
-            ctx.fillRect(
-                y * inputElements['cellSize'],
-                x * inputElements['cellSize'],
-                inputElements['cellSize'],
-                inputElements['cellSize']
-            );
         }
     }
+}
 
-    gameboard.addEventListener('click', function(e) {toggleCell(e);});
-    draw();
-});
+function getUserInputElementValues() {
+      for (const key in inputElements) {
+        inputElements[key] = document.getElementById(key).value || 0;
+      }
+}
 
-document.getElementById('buttonStartGame').addEventListener('click', function(e) {
-    draw();
-});
+function toggleCell(e) {
+    let posX = e.clientX - gameboardBounds.left;
+    let posY = e.clientY - gameboardBounds.top;
 
-function calculateNextTurn() {
-    /*
-        Any live cell with fewer than two live neighbours dies, as if by underpopulation.
-        Any live cell with two or three live neighbours lives on to the next generation.
-        Any live cell with more than three live neighbours dies, as if by overpopulation.
-        Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.
-    */
+    let x = Math.floor(posY / inputElements['cellSize']);
+    let y = Math.floor(posX / inputElements['cellSize']);
+    
+    gameboardMemory[x][y] = 1 - gameboardMemory[x][y];
+}
+
+function calculateNextRound() {
+/*
+    Any live cell with fewer than two live neighbours dies, as if by underpopulation.
+    Any live cell with two or three live neighbours lives on to the next generation.
+    Any live cell with more than three live neighbours dies, as if by overpopulation.
+    Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.
+*/
 
     let shadowMemory = gameboardMemory;
     let neighborCount = 0;
 
     for(var x = 0; x < inputElements['amountOfRows']; x++) {
         for(var y = 0; y < inputElements['amountOfColumns']; y++) {
-            neighborCount = 0 
-                + getCellValue(x-1, y-1)
-                + getCellValue(x, y-1)
-                + getCellValue(x+1, y-1)
-                + getCellValue(x-1, y)
-                + getCellValue(x+1, y)
-                + getCellValue(x-1, y+1)
-                + getCellValue(x, y+1)
-                + getCellValue(x+1, y+1);
-
-            switch(neighborCount) {
+            switch(getNeighborCount(x, y)) {
                 case 0:
                 case 1:
                     shadowMemory[x][y] = 0;
@@ -97,72 +95,48 @@ function calculateNextTurn() {
             }
         }
     }
-
+    
     gameboardMemory = shadowMemory;
-};
+}
 
-function getCellValue(x, y) {
-    if(
-        !(gameboardMemory[x] == undefined) && 
-        !(gameboardMemory[x][y] == undefined) &&
-        gameboardMemory[x][y] == 1    
-    ) {
-        return 1;
+function getNeighborCount(x, y) {
+    let neighborCount = 0;
+
+    for(let a = (x-1); a <= (x+1); a++) {
+        for(let b = (y-1); b <= (y+1); b++) {
+            if(
+                !(gameboardMemory[a] == undefined) && 
+                !(gameboardMemory[a][b] == undefined) &&
+                gameboardMemory[a][b] == 1    
+            ) {
+                neighborCount++;
+            }
+        }
     }
 
-    return 0;
+    return neighborCount;
 }
 
-function getInputElementValues() {
-      for (const key in inputElements) {
-        inputElements[key] = document.getElementById(key).value || 0;
-      }
+function drawNewCanvas() {
+    for(var x = 0; x < inputElements['amountOfRows']; x++) {
+        for(var y = 0; y < inputElements['amountOfColumns']; y++) {
+            ctx.fillStyle = gameboardMemory[x][y] ? liveCellColor : deadCellColor;
+            let rectValues = [y * inputElements['cellSize'], x * inputElements['cellSize'], inputElements['cellSize'], inputElements['cellSize']];
+
+            ctx.strokeRect(...rectValues);
+            ctx.fillRect(...rectValues);
+        }
+    }
 }
 
-function toggleCell(e) {
-    let posX = e.clientX - gameboardBounds.left;
-    let posY = e.clientY - gameboardBounds.top;
-
-    let x = Math.floor(posY / inputElements['cellSize']);
-    let y = Math.floor(posX / inputElements['cellSize']);
-    
-    gameboardMemory[x][y] = 1 - gameboardMemory[x][y];
-    //draw();
-}
-
-function draw() {
-    requestAnimationFrame(draw);
+function loopGame() {
     now = Date.now();
 
     if((now - then) > inputElements['cycleSpeed']) {
         then = now;
-
-        const ctx = gameboard.getContext("2d");
-        ctx.font = "10px serif";
-
-        for(var x = 0; x < inputElements['amountOfRows']; x++) {
-            for(var y = 0; y < inputElements['amountOfColumns']; y++) {
-                ctx.fillStyle = gameboardMemory[x][y] ? liveCellColor : deadCellColor;
-
-                ctx.strokeRect(
-                    y * inputElements['cellSize'],
-                    x * inputElements['cellSize'],
-                    inputElements['cellSize'],
-                    inputElements['cellSize']
-                );
-    
-                ctx.fillRect(
-                    y * inputElements['cellSize'],
-                    x * inputElements['cellSize'],
-                    inputElements['cellSize'],
-                    inputElements['cellSize']
-                );
-
-                // ctx.fillStyle = 'black';
-                // ctx.fillText(`${x}/${y}`, y * inputElements['cellSize'], (x+1) * inputElements['cellSize']);
-            }
-        }
-
-        calculateNextTurn();
+        calculateNextRound();
+        drawNewCanvas();
     }
+
+    requestAnimationFrame(loopGame);
 }

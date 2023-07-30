@@ -50,6 +50,59 @@ document.getElementById('buttonPrepareField').addEventListener('click', function
     draw();
 });
 
+document.getElementById('buttonStartGame').addEventListener('click', function(e) {
+    draw();
+});
+
+function calculateNextTurn() {
+    /*
+        Any live cell with fewer than two live neighbours dies, as if by underpopulation.
+        Any live cell with two or three live neighbours lives on to the next generation.
+        Any live cell with more than three live neighbours dies, as if by overpopulation.
+        Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.
+    */
+
+    let shadowMemory = gameboardMemory;
+    let neighborCount = 0;
+
+    for(var x = 0; x < inputElements['amountOfRows']; x++) {
+        for(var y = 0; y < inputElements['amountOfColumns']; y++) {
+            neighborCount = 0 + getCellValue(x-1, y-1) + getCellValue(x-1, y+1) + getCellValue(x+1, y-1) + getCellValue(x+1, y+1);
+
+            switch(neighborCount) {
+                case 0:
+                case 1:
+                case 4:
+                    //new value will be 0
+                    shadowMemory[x][y] = 0;
+                    break;
+                case 2:
+                    //new value will be old value
+                    //no operation needed
+                    break;
+                case 3:
+                    //new value will be 1
+                    shadowMemory[x][y] = 1;
+                    break;
+            }
+        }
+    }
+
+    gameboardMemory = shadowMemory;
+};
+
+function getCellValue(x, y) {
+    if(
+        !(gameboardMemory[x] == undefined) && 
+        !(gameboardMemory[x][y] == undefined) &&
+        gameboardMemory[x][y] == 1    
+    ) {
+        return 1;
+    }
+
+    return 0;
+}
+
 function getInputElementValues() {
       for (const key in inputElements) {
         inputElements[key] = document.getElementById(key).value || 0;
@@ -97,5 +150,6 @@ function draw() {
 
 
         requestAnimationFrame(draw);
+        calculateNextTurn();
     }, inputElements['cycleSpeed']);
 }

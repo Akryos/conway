@@ -3,6 +3,7 @@ inputElements['amountOfRows'] = 0;
 inputElements['amountOfColumns'] = 0;
 inputElements['cellSize'] = 0;
 inputElements['cycleSpeed'] = 0;
+inputElements['amountOfTurnsTaken'] = 0;
 
 const gameboard = document.getElementById('gameboard');
 const ctx = gameboard.getContext("2d");
@@ -16,6 +17,7 @@ const liveCellColor = '#fcba03';
 
 var then = Date.now();
 var now = then;
+var animationRequestID = undefined;
 
 gameboard.addEventListener('click', function(e) {
     toggleCell(e);
@@ -30,6 +32,10 @@ document.getElementById('buttonPrepareField').addEventListener('click', function
 
 document.getElementById('buttonStartGame').addEventListener('click', function(){
     loopGame();
+});
+
+document.getElementById('buttonStopGame').addEventListener('click', function(){
+    stopGame();
 });
 
 function createGameboard() {
@@ -53,6 +59,10 @@ function getUserInputElementValues() {
       for (const key in inputElements) {
         inputElements[key] = document.getElementById(key).value || 0;
       }
+}
+
+function incrementTurnValue() {
+    document.getElementById('amountOfTurnsTaken').value = ++inputElements['amountOfTurnsTaken'];
 }
 
 function toggleCell(e) {
@@ -134,9 +144,17 @@ function loopGame() {
 
     if((now - then) > inputElements['cycleSpeed']) {
         then = now;
+        incrementTurnValue();
         calculateNextRound();
         drawNewCanvas();
     }
 
-    requestAnimationFrame(loopGame);
+    animationRequestID = requestAnimationFrame(loopGame);
+}
+
+function stopGame() {
+    if(animationRequestID) {
+        window.cancelAnimationFrame(animationRequestID);
+        animationRequestID = undefined;
+     }
 }

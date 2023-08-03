@@ -82,29 +82,26 @@ function calculateNextRound() {
     Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.
 */
 
-    let shadowMemory = gameboardMemory;
-    let neighborCount = 0;
+    let shadowMemory = JSON.parse(JSON.stringify(gameboardMemory));
 
     for(var x = 0; x < inputElements['amountOfRows']; x++) {
         for(var y = 0; y < inputElements['amountOfColumns']; y++) {
             switch(getNeighborCount(x, y)) {
-                case 0:
-                case 1:
-                    shadowMemory[x][y] = 0;
-                    break;
                 case 2:
-                    //no operation needed
+                    shadowMemory[x][y] = gameboardMemory[x][y];
                     break;
                 case 3:
                     shadowMemory[x][y] = 1;
                     break;
-                default: //more than 3
+                case 0:
+                case 1:
+                default:
                     shadowMemory[x][y] = 0;
                     break;
             }
         }
     }
-    
+
     gameboardMemory = shadowMemory;
 }
 

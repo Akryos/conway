@@ -116,6 +116,7 @@ function getNeighborCount(x, y) {
             if(
                 !(gameboardMemory[a] == undefined) && 
                 !(gameboardMemory[a][b] == undefined) &&
+                !( x == a && y == b ) &&
                 gameboardMemory[a][b] == 1    
             ) {
                 neighborCount++;
